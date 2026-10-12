@@ -1,0 +1,35 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "dev.precleared/contact-check",
+  "title": "Precleared Contact Check",
+  "description": "Is this cold email allowed? Per-address verdict, rule quoted, signed receipt. UK, US, CA, DE, FR.",
+  "version": "1.0.0",
+  "websiteUrl": "https://precleared.dev",
+  "repository": {
+    "url": "https://github.com/gabrielaoimevbore-beep/precleared-mcp",
+    "source": "github"
+  },
+  "icons": [
+    {
+      "src": "https://precleared.dev/icon.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "512x512"
+      ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://precleared.dev/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Optional. Bearer pc_live_... from https://precleared.dev/get-key for 25 free checks a day and prepaid packs; without it, 10 free checks a day.",
+          "isRequired": false,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
