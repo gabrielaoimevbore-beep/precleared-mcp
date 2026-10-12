@@ -24,6 +24,12 @@ claude mcp add --transport http precleared https://precleared.dev/mcp
 
 **Claude.ai and the Claude desktop app:** Settings, Connectors, Add custom connector, paste `https://precleared.dev/mcp`.
 
+**Claude directory:** https://claude.ai/directory/precleared (one click, no setup).
+
+**Smithery:** https://smithery.ai/servers/gabrielaoimevbore/precleared
+
+**Official MCP registry:** `dev.precleared/contact-check`
+
 **Any MCP client (JSON):**
 
 ```json
