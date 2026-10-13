@@ -30,6 +30,8 @@ claude mcp add --transport http precleared https://precleared.dev/mcp
 
 **Official MCP registry:** `dev.precleared/contact-check`
 
+**Clients that only speak stdio:** `npx mcp-remote https://precleared.dev/mcp --transport http-only`, or build this repo's Dockerfile (`docker build -t precleared . && docker run -i precleared`).
+
 **Any MCP client (JSON):**
 
 ```json
