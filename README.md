@@ -30,7 +30,21 @@ claude mcp add --transport http precleared https://precleared.dev/mcp
 
 **Official MCP registry:** `dev.precleared/contact-check`
 
-**Clients that only speak stdio:** `npx mcp-remote https://precleared.dev/mcp --transport http-only`, or build this repo's Dockerfile (`docker build -t precleared . && docker run -i precleared`).
+**Local server over stdio (this repository):** for clients that only run local servers.
+
+```json
+{
+  "mcpServers": {
+    "precleared": {
+      "command": "npx",
+      "args": ["-y", "github:gabrielaoimevbore-beep/precleared-mcp"],
+      "env": { "PRECLEARED_API_KEY": "pc_live_..." }
+    }
+  }
+}
+```
+
+Or with Docker: `docker build -t precleared-mcp . && docker run -i --rm -e PRECLEARED_API_KEY=pc_live_... precleared-mcp`. The key is optional either way. Any client can also bridge the hosted endpoint with `npx mcp-remote https://precleared.dev/mcp --transport http-only`.
 
 **Any MCP client (JSON):**
 
@@ -45,7 +59,19 @@ claude mcp add --transport http precleared https://precleared.dev/mcp
 }
 ```
 
-The `Authorization` header is optional. Without a key you get 10 free checks a day. A free key from https://precleared.dev/get-key gives 25 a day; a £39 pack adds 2,000 checks that never expire.
+The `Authorization` header is optional. Without a key you get 100 free checks a day over the hosted MCP endpoint (10 over REST). A free key from https://precleared.dev/get-key gives 25 a day; a £39 pack adds 2,000 checks that never expire.
+
+## What is in this repository
+
+`index.js` is a small MCP server (Node 18 or later, one dependency) that exposes the same two tools as the hosted endpoint and fulfils them through the public REST API. Nothing is stored locally and nothing is sent to the recipient. The hosted endpoint at `https://precleared.dev/mcp` is the canonical server: without a key it allows 100 checks a day, while the REST API behind this local server allows 10 a day per network, so add a free key if you run it locally at any volume.
+
+```bash
+npm install
+npm test        # runs the server against a fake API on localhost, no network needed
+PRECLEARED_API_KEY=pc_live_... node index.js
+```
+
+Environment: `PRECLEARED_API_KEY` (optional), `PRECLEARED_API_BASE` (default `https://precleared.dev/api/v1`), `PRECLEARED_TIMEOUT_MS` (default 30000).
 
 ## Tools
 
