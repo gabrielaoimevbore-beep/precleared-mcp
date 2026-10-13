@@ -1,0 +1,47 @@
+{
+  "name": "precleared-mcp",
+  "version": "1.0.1",
+  "description": "Cold email compliance check for outreach agents: GDPR, PECR, CAN-SPAM, CASL verdict with a signed receipt. Stdio MCP server for the hosted Precleared service.",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "precleared-mcp": "index.js"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test/run.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "author": "Precleared <support@precleared.dev>",
+  "homepage": "https://precleared.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrielaoimevbore-beep/precleared-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gabrielaoimevbore-beep/precleared-mcp/issues"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "cold-email",
+    "compliance",
+    "gdpr",
+    "pecr",
+    "can-spam",
+    "casl",
+    "ai-agents"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1"
+  }
+}
