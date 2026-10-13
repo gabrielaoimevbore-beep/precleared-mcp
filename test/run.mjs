@@ -75,6 +75,9 @@ await withServer({ PRECLEARED_API_BASE: "http://127.0.0.1:1/api/v1" }, async (cl
   assert.deepEqual(tools.map((t) => t.name).sort(), ["contact_check", "verify_receipt"]);
   assert.equal(tools.find((t) => t.name === "verify_receipt").annotations.readOnlyHint, true);
   assert.deepEqual(tools.find((t) => t.name === "verify_receipt").inputSchema.required, ["id"]);
+  assert.deepEqual(tools.find((t) => t.name === "contact_check").outputSchema.required, ["verdict"]);
+  assert.deepEqual(tools.find((t) => t.name === "verify_receipt").outputSchema.required, ["id"]);
+  assert.match(tools.find((t) => t.name === "contact_check").description, /Not needed for transactional emails/);
   console.log("ok  introspection without network");
 
   // 2. Unreachable API gives an error result, not a crash.
@@ -86,6 +89,7 @@ await withServer({ PRECLEARED_API_BASE: "http://127.0.0.1:1/api/v1" }, async (cl
 
 // 3. Real round trips against the fake API, with a key.
 await withServer({ PRECLEARED_API_BASE: `http://127.0.0.1:${port}/api/v1/`, PRECLEARED_API_KEY: "pc_test_KEY" }, async (client) => {
+  await client.listTools(); // so the client checks structured results against each tool's output schema
   const r = await client.callTool({
     name: "contact_check",
     arguments: { recipient_email: "jane@acme.co.uk", address_source: "published", pitch: "bookkeeping software", existing_customer: false, suppressed: undefined },
