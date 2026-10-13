@@ -17,7 +17,7 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
-const VERSION = "1.0.1";
+const VERSION = "1.1.0";
 const API_BASE = (process.env.PRECLEARED_API_BASE || "https://precleared.dev/api/v1").replace(/\/+$/, "");
 const API_KEY = (process.env.PRECLEARED_API_KEY || "").trim();
 const TIMEOUT_MS = Math.max(1000, Number(process.env.PRECLEARED_TIMEOUT_MS) || 30000);
@@ -27,8 +27,10 @@ const DOCS_URL = "https://precleared.dev/docs";
 const INSTRUCTIONS =
   "Precleared answers one question for outbound agents: may a cold or unsolicited marketing email be sent to this address? " +
   "Use contact_check once per recipient before the first email to anyone who is not already a customer, in the UK, US, Canada, Germany or France. " +
-  "It returns a verdict (ok_to_email, consent_needed, blocked or unknown), the rule that decided it with its source, the footer wording the email must carry, a next step and a signed receipt id. " +
-  "ok_to_email means send with footer_text included; consent_needed and blocked mean do not send and follow next_step; unknown means a fact could not be established, so treat it as consent_needed unless you can supply the missing fact. " +
+  "It is not needed for transactional emails such as invoices, receipts or password resets. " +
+  "It returns a verdict (ok_to_email, consent_needed, blocked or unknown), the rule that decided it with its source, what the email's footer must include (footer_text), a next step and a signed receipt id. " +
+  "ok_to_email means send, with a footer that meets footer_text, for example who you are, a postal address and a way to opt out; footer_text describes the requirement and is not wording to paste. " +
+  "consent_needed and blocked mean do not send and follow next_step; unknown means a fact could not be established, so treat it as consent_needed unless you can supply the missing fact. " +
   "No sign-in is needed, a check takes about a second, and nothing is sent to the recipient. " +
   "verify_receipt returns a receipt by id so a check can be shown to a person later.";
 
@@ -52,7 +54,9 @@ const TOOLS = [
     description:
       "Check whether a cold or unsolicited marketing email to one recipient is allowed under UK PECR and GDPR, US CAN-SPAM, Canadian CASL, German UWG or French rules. " +
       "Use it before the first email to a new contact, one call per address. " +
-      "Returns the verdict, confidence, the rule quoted with its source, the footer wording the email needs, the next step, the facts used and a signed receipt. It does not send anything.",
+      "Not needed for transactional emails such as invoices, receipts or password resets. " +
+      "Returns the verdict, confidence, the rule quoted with its source, what the email's footer must include, the next step and the facts used. " +
+      "Each check uses one check from your allowance and is saved as a signed receipt. It does not send anything.",
     inputSchema: {
       type: "object",
       properties: {
@@ -108,6 +112,23 @@ const TOOLS = [
         },
       },
     },
+    outputSchema: {
+      type: "object",
+      properties: {
+        verdict: { type: "string", enum: ["ok_to_email", "consent_needed", "blocked", "unknown"], description: "The answer for this recipient." },
+        confidence: { type: "string", description: "high, medium or low." },
+        reasons: { type: "array", items: { type: "object" }, description: "The rule that matched, with its text and source, then any notes." },
+        rules_applied: { type: "array", items: { type: "string" }, description: "Rule keys used." },
+        footer_text: { type: ["string", "null"], description: "What the email's footer must include, if the rule sets requirements." },
+        next_step: { type: ["string", "null"], description: "What to do next." },
+        facts: { type: "object", description: "Facts gathered about the recipient." },
+        receipt: { type: "object", description: "Signed receipt for this check, with id and verify_url." },
+        rules_version: { type: "string", description: "Version of the rule set used." },
+        usage: { type: "object", description: "Allowance left for the caller." },
+        disclaimer: { type: "string", description: "Fixed disclaimer line." },
+      },
+      required: ["verdict"],
+    },
     annotations: {
       title: "Contact check",
       readOnlyHint: false,
@@ -129,6 +150,27 @@ const TOOLS = [
           type: "string",
           description: "Receipt id, such as cc_rcpt_0123456789ABCDEF.",
         },
+      },
+      required: ["id"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        id: { type: "string", description: "Receipt id." },
+        created_at: { type: ["string", "null"], description: "When the check was made." },
+        verdict: { type: ["string", "null"], description: "Verdict given." },
+        confidence: { type: ["string", "null"], description: "Confidence given." },
+        rules_applied: { type: ["array", "null"], items: { type: "string" }, description: "Rule keys used." },
+        recipient_domain: { type: ["string", "null"], description: "Recipient domain." },
+        recipient_email_masked: { type: ["string", "null"], description: "Masked recipient address." },
+        sender_country: { type: ["string", "null"], description: "Sender country." },
+        rules_version: { type: ["string", "null"], description: "Rule set version." },
+        request_hash: { type: ["string", "null"], description: "SHA-256 of the request." },
+        response_hash: { type: ["string", "null"], description: "SHA-256 of the response." },
+        signature: { type: ["string", "null"], description: "Ed25519 signature, base64." },
+        algorithm: { type: ["string", "null"], description: "Signature algorithm." },
+        key_version: { type: ["string", "null"], description: "Signing key version." },
+        public_key: { type: ["string", "null"], description: "Public key, base64 SPKI DER." },
       },
       required: ["id"],
     },
