@@ -1,7 +1,10 @@
-# Runs Precleared's hosted MCP server over stdio for clients that cannot speak streamable HTTP directly.
-# The real server lives at https://precleared.dev/mcp; this image is a thin bridge using mcp-remote.
+# Precleared MCP server over stdio. Builds the small server in this repository (index.js),
+# which fulfils contact_check and verify_receipt through the public REST API at https://precleared.dev/api/v1.
+#   docker build -t precleared-mcp . && docker run -i --rm precleared-mcp
 FROM node:20-alpine
-RUN npm install -g mcp-remote
-ENV PRECLEARED_URL=https://precleared.dev/mcp
-# Optional: pass an API key with -e PRECLEARED_API_KEY=pc_live_... for 25 checks a day and prepaid packs.
-ENTRYPOINT ["sh", "-c", "if [ -n \"$PRECLEARED_API_KEY\" ]; then exec mcp-remote \"$PRECLEARED_URL\" --transport http-only --header \"Authorization: Bearer $PRECLEARED_API_KEY\"; else exec mcp-remote \"$PRECLEARED_URL\" --transport http-only; fi"]
+WORKDIR /app
+COPY package.json ./
+RUN npm install --omit=dev --no-audit --no-fund
+COPY index.js ./
+# Optional: -e PRECLEARED_API_KEY=pc_live_... for 25 checks a day and prepaid packs.
+ENTRYPOINT ["node", "index.js"]
