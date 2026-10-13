@@ -2,7 +2,11 @@
 
 # Precleared: cold-email legality checks for AI agents
 
-**Is your agent allowed to send that?** Precleared answers before the email goes out: a per-address verdict on cold marketing email, the rule quoted, the footer wording, and a signed receipt anyone can verify. Covers the UK (PECR and UK GDPR), the US (CAN-SPAM), Canada (CASL), Germany (UWG) and France.
+[![smithery badge](https://smithery.ai/badge/gabrielaoimevbore/precleared)](https://smithery.ai/servers/gabrielaoimevbore/precleared)
+
+**Is your agent allowed to send that?** Precleared answers before the email goes out: a per-address verdict on cold marketing email, the rule quoted, what the footer must include, and a signed receipt anyone can verify. Covers the UK (PECR and UK GDPR), the US (CAN-SPAM), Canada (CASL), Germany (UWG) and France.
+
+It sits between the step that finds an address (Hunter, Apollo, Clay) and the step that sends (Gmail, Outlook, Instantly, lemlist). One call per new contact, before the first email. It is not needed for invoices, receipts or other transactional email.
 
 - Site and docs: https://precleared.dev/docs
 - MCP server (streamable HTTP): `https://precleared.dev/mcp`
@@ -26,7 +30,7 @@ claude mcp add --transport http precleared https://precleared.dev/mcp
 
 **Claude directory:** https://claude.ai/directory/precleared (one click, no setup).
 
-**Smithery:** https://smithery.ai/servers/gabrielaoimevbore/precleared
+**Smithery:** connect through https://smithery.ai/servers/gabrielaoimevbore/precleared. The key is an optional connection setting there.
 
 **Official MCP registry:** `dev.precleared/contact-check`
 
@@ -59,7 +63,7 @@ Or with Docker: `docker build -t precleared-mcp . && docker run -i --rm -e PRECL
 }
 ```
 
-The `Authorization` header is optional. Without a key you get 100 free checks a day over the hosted MCP endpoint (10 over REST). A free key from https://precleared.dev/get-key gives 25 a day; a £39 pack adds 2,000 checks that never expire.
+The `Authorization` header is optional, and `X-API-Key: pc_live_...` works too. Without a key you get 100 free checks a day over the hosted MCP endpoint (10 over REST). A free key from https://precleared.dev/get-key gives 25 a day; a £39 pack adds 2,000 checks that never expire.
 
 ## What is in this repository
 
@@ -77,7 +81,7 @@ Environment: `PRECLEARED_API_KEY` (optional), `PRECLEARED_API_BASE` (default `ht
 
 | Tool | What it does |
 | --- | --- |
-| `contact_check` | Takes a recipient email or domain, your sender country (GB or US), the pitch and where the address came from. Returns `verdict` (ok_to_email, consent_needed, blocked or unknown), `confidence`, the rule quoted with its source, `footer_text`, `next_step`, the facts used, and a signed `receipt`. |
+| `contact_check` | Takes a recipient email or domain, your sender country (GB or US), the pitch and where the address came from. Returns `verdict` (ok_to_email, consent_needed, blocked or unknown), `confidence`, the rule quoted with its source, `footer_text` (what the email's footer must include, not wording to paste), `next_step`, the facts used, and a signed `receipt`. Not needed for transactional email such as invoices. |
 | `verify_receipt` | Takes a receipt id and returns the receipt with its hashes, Ed25519 signature and public key. |
 
 ## Example
