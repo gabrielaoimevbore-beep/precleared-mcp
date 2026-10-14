@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "dev.precleared/contact-check",
   "title": "Precleared Contact Check",
-  "description": "Is this cold email allowed? Per-address verdict, rule quoted, signed receipt. UK, US, CA, DE, FR.",
-  "version": "1.0.0",
+  "description": "Cold email compliance check for outreach agents: GDPR, PECR, CAN-SPAM, CASL verdict, signed receipt.",
+  "version": "1.0.3",
   "websiteUrl": "https://precleared.dev",
   "repository": {
     "url": "https://github.com/gabrielaoimevbore-beep/precleared-mcp",
@@ -25,7 +25,7 @@
       "headers": [
         {
           "name": "Authorization",
-          "description": "Optional. Bearer pc_live_... from https://precleared.dev/get-key for 25 free checks a day and prepaid packs; without it, 10 free checks a day.",
+          "description": "Optional. Bearer pc_live_... from https://precleared.dev/get-key, for prepaid packs. Without it, 100 free checks a day over MCP.",
           "isRequired": false,
           "isSecret": true
         }
