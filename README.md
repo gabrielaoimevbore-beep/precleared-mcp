@@ -63,7 +63,7 @@ Or with Docker: `docker build -t precleared-mcp . && docker run -i --rm -e PRECL
 }
 ```
 
-The `Authorization` header is optional, and `X-API-Key: pc_live_...` works too. Without a key you get 100 free checks a day over the hosted MCP endpoint (10 over REST). A free key from https://precleared.dev/get-key gives 25 a day; a £39 pack adds 2,000 checks that never expire.
+The `Authorization` header is optional, and `X-API-Key: pc_live_...` works too. Without a key you get 100 free checks a day over the hosted MCP endpoint (10 over REST), shared by everyone on the same IP address. A free key from https://precleared.dev/get-key gives you your own 100 a day over MCP (25 over REST); a £39 pack adds 2,000 checks that never expire.
 
 ## What is in this repository
 
