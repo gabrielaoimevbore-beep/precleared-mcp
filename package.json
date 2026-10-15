@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "start": "node index.js",
-    "test": "node test/run.mjs"
+    "test": "node test/run.mjs && node test/skill.mjs"
   },
   "engines": {
     "node": ">=18"
