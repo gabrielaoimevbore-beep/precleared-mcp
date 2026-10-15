@@ -1,0 +1,20 @@
+{
+  "name": "precleared",
+  "displayName": "Precleared",
+  "version": "1.0.0",
+  "description": "Checks whether a cold marketing email to a specific address is allowed before your agent sends it, under UK, US, Canadian, German and French rules. Bundles the cold-email-check skill with the Precleared connector: a verdict per address, the rule quoted, what the footer must include and a signed receipt.",
+  "author": {
+    "name": "Precleared",
+    "email": "support@precleared.dev",
+    "url": "https://precleared.dev"
+  },
+  "homepage": "https://precleared.dev",
+  "repository": "https://github.com/gabrielaoimevbore-beep/precleared-mcp",
+  "license": "MIT",
+  "keywords": ["cold-email", "outreach", "prospecting", "sales", "compliance", "gdpr", "pecr", "can-spam", "casl"],
+  "icon": "./assets/icon.svg",
+  "documentationUrl": "https://precleared.dev/docs",
+  "supportUrl": "https://github.com/gabrielaoimevbore-beep/precleared-mcp/issues",
+  "privacyPolicyUrl": "https://precleared.dev/privacy",
+  "termsOfServiceUrl": "https://precleared.dev/terms"
+}
