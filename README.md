@@ -14,6 +14,36 @@ It sits between the step that finds an address (Hunter, Apollo, Clay) and the st
 - OpenAPI: https://precleared.dev/openapi.json
 - Rules, with sources: https://precleared.dev/rules
 
+## Plugin and agent skill
+
+This repository is also a Claude plugin and an [Agent Skills](https://agentskills.io) skill. The plugin connects your agent to the hosted MCP server and adds `cold-email-check`, a skill that tells the agent when to run a check (before the first cold email to a new address, not for invoices or replies), how to fill in the facts without guessing, what to do with each verdict and where to keep the receipt.
+
+**Claude Code:**
+
+```bash
+claude plugin marketplace add gabrielaoimevbore-beep/precleared-mcp
+claude plugin install precleared@precleared
+```
+
+If you added the Precleared MCP server separately before, remove it so the tools don't appear twice.
+
+**Claude.ai, the desktop app and Cowork:** Customize, Plugins, Add, Add marketplace, enter `gabrielaoimevbore-beep/precleared-mcp`, then add Precleared and connect its connector from the plugin's Connectors tab.
+
+**Cursor, Codex, OpenCode and other agents that read skills:**
+
+```bash
+npx skills add gabrielaoimevbore-beep/precleared-mcp
+```
+
+The skill uses the Precleared MCP tools when they are connected. Otherwise it runs `skills/cold-email-check/scripts/check.mjs` (Node 18 or later, no dependencies), which calls the REST API for one address or a whole list:
+
+```bash
+node skills/cold-email-check/scripts/check.mjs --email jane@acme.co.uk --sender GB --source SOURCE --pitch "bookkeeping software"
+node skills/cold-email-check/scripts/check.mjs --file leads.csv --sender GB --source SOURCE --out leads-checked.csv
+```
+
+SOURCE is where the addresses came from: `published`, `bought`, `scraped`, `given` or `unknown`. It changes the verdict, so give the real answer. The script sends each address and the facts given for it to precleared.dev, with `PRECLEARED_API_KEY` if you set it. Nothing else leaves your machine, and nothing is sent to the recipient.
+
 ## Add it to your client
 
 **Cursor:** [Add to Cursor](cursor://anysphere.cursor-deeplink/mcp/install?name=precleared&config=eyJ1cmwiOiAiaHR0cHM6Ly9wcmVjbGVhcmVkLmRldi9tY3AifQ==)
@@ -71,11 +101,13 @@ The `Authorization` header is optional, and `X-API-Key: pc_live_...` works too. 
 
 ```bash
 npm install
-npm test        # runs the server against a fake API on localhost, no network needed
+npm test        # runs the server and the skill script against a fake API on localhost, no network needed
 PRECLEARED_API_KEY=pc_live_... node index.js
 ```
 
 Environment: `PRECLEARED_API_KEY` (optional), `PRECLEARED_API_BASE` (default `https://precleared.dev/api/v1`), `PRECLEARED_TIMEOUT_MS` (default 30000).
+
+The plugin lives beside it: `.claude-plugin/` holds the plugin and marketplace manifests, `.mcp.json` points at the hosted server, and `skills/cold-email-check/` holds the skill and its script. `node test/skill.mjs` tests the script against a fake API.
 
 ## Tools
 
