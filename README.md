@@ -34,8 +34,6 @@ claude mcp add --transport http precleared https://precleared.dev/mcp
 
 **Official MCP registry:** `dev.precleared/contact-check`
 
-See more on [Claude Market's MCP directory](https://www.claudemarket.ai/mcp)
-
 **Local server over stdio (this repository):** for clients that only run local servers.
 
 ```json
