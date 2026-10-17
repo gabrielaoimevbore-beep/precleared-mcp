@@ -1,0 +1,27 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "precleared",
+  "version": "1.1.0",
+  "description": "Checks whether a cold marketing email to a specific address is allowed before your agent sends it, in the UK, US, Canada, Germany, France, Australia, Ireland and the Netherlands. One call per address: a verdict, the rule quoted with its source, what the footer must include and a signed receipt.",
+  "author": {
+    "name": "Precleared",
+    "email": "support@precleared.dev",
+    "url": "https://precleared.dev"
+  },
+  "homepage": "https://precleared.dev/docs",
+  "repository": "https://github.com/gabrielaoimevbore-beep/precleared-mcp",
+  "license": "MIT",
+  "keywords": [
+    "cold-email",
+    "outreach",
+    "prospecting",
+    "sales",
+    "compliance",
+    "gdpr",
+    "pecr",
+    "can-spam",
+    "casl",
+    "spam-act",
+    "mcp"
+  ]
+}
