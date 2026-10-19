@@ -1,0 +1,185 @@
+identity:
+  name: check_cold_email
+  author: precleared
+  label:
+    en_US: Check cold email compliance
+description:
+  human:
+    en_US: Checks whether a cold or marketing email to one recipient is allowed, before the first email. Returns the verdict, the rule quoted with its source, the footer requirements, the next step and a signed receipt ID.
+  llm: >-
+    Checks whether it is legal to send a cold or marketing email to one recipient, before the first email,
+    under UK PECR and GDPR, US CAN-SPAM, Canadian CASL, German UWG, French CPCE, Australia's Spam Act,
+    Ireland's ePrivacy Regulations and the Dutch Telecommunicatiewet. Call it once per address for every new
+    lead or prospect who is not already a customer, including every address in a lead list. It is not needed
+    for transactional emails such as invoices, receipts or password resets. Give recipient_email or
+    recipient_domain. Act on the verdict: ok_to_email means send, with a footer that meets footer_text (a
+    description of the requirement, not wording to paste); consent_needed and blocked mean do not send and
+    follow next_step; unknown means a fact could not be established, so treat it as consent_needed unless you
+    can supply the missing fact. Keep the receipt ID with the send.
+parameters:
+  - name: recipient_email
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: Recipient email
+    human_description:
+      en_US: The recipient's email address. Give this or Recipient domain.
+    llm_description: The recipient's email address. Give this or recipient_domain.
+  - name: recipient_domain
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: Recipient domain
+    human_description:
+      en_US: The recipient's domain when you have no email address, for example acme.co.uk. Give this or Recipient email.
+    llm_description: The recipient's domain when there is no email address, for example acme.co.uk. Give this or recipient_email.
+  - name: sender_country
+    type: select
+    required: false
+    default: GB
+    form: form
+    label:
+      en_US: Sender country
+    human_description:
+      en_US: The country your sending business is based in. This is not the recipient's country.
+    llm_description: Country the sending business is based in, GB or US. Not the recipient's country.
+    options:
+      - value: GB
+        label:
+          en_US: United Kingdom (GB)
+      - value: US
+        label:
+          en_US: United States (US)
+  - name: address_source
+    type: select
+    required: false
+    default: unknown
+    form: llm
+    label:
+      en_US: Address source
+    human_description:
+      en_US: Where the address came from. It affects the verdict, so don't assume published.
+    llm_description: >-
+      Where the address came from: published (on their website, profile or a directory), bought (a purchased
+      list), scraped (collected by a tool), given (the person gave it to you) or unknown. It affects the
+      verdict, so do not assume published.
+    options:
+      - value: published
+        label:
+          en_US: Published by them
+      - value: bought
+        label:
+          en_US: Bought list
+      - value: scraped
+        label:
+          en_US: Scraped
+      - value: given
+        label:
+          en_US: Given by them
+      - value: unknown
+        label:
+          en_US: Unknown
+  - name: pitch
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: Pitch
+    human_description:
+      en_US: What the email offers, in a few words, for example bookkeeping software for dental practices. Used to judge relevance to the recipient's role.
+    llm_description: What the email offers, in a few words, for example 'bookkeeping software for dental practices'. Used to judge relevance to the recipient's role.
+  - name: recipient_country
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: Recipient country
+    human_description:
+      en_US: Two-letter country code of the recipient if known, for example GB or DE. Otherwise Precleared works it out from the domain, company records and the company's website.
+    llm_description: Two-letter country code of the recipient if known, for example GB or DE. Leave empty to let Precleared work it out.
+  - name: default_recipient_country
+    type: string
+    required: false
+    form: form
+    label:
+      en_US: Fallback country
+    human_description:
+      en_US: Two-letter country code used only when the recipient's country can't be worked out, for example US if all your prospects are in the US. Recipient country always wins.
+    llm_description: Two-letter country code used only when the recipient's country can't be worked out. recipient_country always wins.
+  - name: company_number
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: Company number
+    human_description:
+      en_US: UK company number if known (8 characters), so the company register can confirm the company.
+    llm_description: UK company number if known (8 characters), so the register can confirm the company.
+  - name: pitch_relevant
+    type: select
+    required: false
+    form: llm
+    label:
+      en_US: Pitch relevant
+    human_description:
+      en_US: Whether the pitch relates to the recipient's job or business. Leave empty if you don't know.
+    llm_description: yes if the pitch relates to the recipient's job or business, no if it does not. Leave empty if unknown.
+    options:
+      - value: "yes"
+        label:
+          en_US: "Yes"
+      - value: "no"
+        label:
+          en_US: "No"
+  - name: existing_customer
+    type: boolean
+    required: false
+    default: false
+    form: llm
+    label:
+      en_US: Existing customer
+    human_description:
+      en_US: Turn on if the recipient has bought from you before.
+    llm_description: True if the recipient has bought from you before. Default false.
+  - name: suppressed
+    type: boolean
+    required: false
+    default: false
+    form: llm
+    label:
+      en_US: Suppressed
+    human_description:
+      en_US: Turn on if the recipient is on your own do-not-contact list.
+    llm_description: True if the recipient is on your own do-not-contact list.
+output_schema:
+  type: object
+  properties:
+    verdict:
+      type: string
+      description: ok_to_email, consent_needed, blocked or unknown. Empty when the check could not run.
+    ok_to_send:
+      type: boolean
+      description: True only when the verdict is ok_to_email.
+    rule:
+      type: string
+      description: The rule that decided the verdict, or a note when no rule could be applied.
+    rule_source:
+      type: string
+      description: The legal source of that rule.
+    next_step:
+      type: string
+      description: What to do next.
+    footer_text:
+      type: string
+      description: What the email's footer must include. A description of the requirement, not wording to paste.
+    receipt_id:
+      type: string
+      description: The signed receipt ID for this check.
+    error:
+      type: string
+      description: Why the check could not run, for example a rejected key. Empty when it ran.
+extra:
+  python:
+    source: tools/check_cold_email.py

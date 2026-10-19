@@ -1,0 +1,25 @@
+identity:
+  name: get_receipt
+  author: precleared
+  label:
+    en_US: Get a receipt
+description:
+  human:
+    en_US: Fetches a Precleared receipt by its ID to show what was checked, when and the verdict, with the signature details needed to verify it.
+  llm: >-
+    Fetches a Precleared receipt by its ID (cc_rcpt_ followed by 16 characters) when a person or an audit asks
+    for proof of a check. Returns what was checked, when, the verdict, and the hashes, Ed25519 signature and
+    public key needed to verify it.
+parameters:
+  - name: receipt_id
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: Receipt ID
+    human_description:
+      en_US: The receipt ID from a check, such as cc_rcpt_0123456789ABCDEF.
+    llm_description: The receipt ID from a check, such as cc_rcpt_0123456789ABCDEF.
+extra:
+  python:
+    source: tools/get_receipt.py
