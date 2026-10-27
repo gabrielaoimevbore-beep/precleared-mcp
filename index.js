@@ -7,7 +7,7 @@
 // Nothing is sent to the recipient; nothing is stored locally.
 //
 // Environment:
-//   PRECLEARED_API_KEY   optional, pc_live_... (free key: 25 checks a day; packs on top)
+//   PRECLEARED_API_KEY   optional, pc_live_... (a new key: 100 checks a day for 14 days, then 25; packs on top)
 //   PRECLEARED_API_BASE  optional, defaults to https://precleared.dev/api/v1
 //   PRECLEARED_TIMEOUT_MS optional, per request, default 30000
 //
@@ -17,7 +17,7 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
-const VERSION = "1.1.0";
+const VERSION = "1.2.0";
 const API_BASE = (process.env.PRECLEARED_API_BASE || "https://precleared.dev/api/v1").replace(/\/+$/, "");
 const API_KEY = (process.env.PRECLEARED_API_KEY || "").trim();
 const TIMEOUT_MS = Math.max(1000, Number(process.env.PRECLEARED_TIMEOUT_MS) || 30000);
@@ -26,12 +26,12 @@ const DOCS_URL = "https://precleared.dev/docs";
 
 const INSTRUCTIONS =
   "Precleared answers one question for outbound agents: may a cold or unsolicited marketing email be sent to this address? " +
-  "Use contact_check once per recipient before the first email to anyone who is not already a customer, in the UK, US, Canada, Germany or France. " +
+  "Use contact_check once per recipient before the first email to anyone who is not already a customer, in the UK, US, Canada, Germany, France, Australia, Ireland or the Netherlands. " +
   "It is not needed for transactional emails such as invoices, receipts or password resets. " +
   "It returns a verdict (ok_to_email, consent_needed, blocked or unknown), the rule that decided it with its source, what the email's footer must include (footer_text), a next step and a signed receipt id. " +
   "ok_to_email means send, with a footer that meets footer_text, for example who you are, a postal address and a way to opt out; footer_text describes the requirement and is not wording to paste. " +
   "consent_needed and blocked mean do not send and follow next_step; unknown means a fact could not be established, so treat it as consent_needed unless you can supply the missing fact. " +
-  "No sign-in is needed, a check takes about a second, and nothing is sent to the recipient. " +
+  "No sign-in is needed, a check usually takes a few seconds, and nothing is sent to the recipient. " +
   "verify_receipt returns a receipt by id so a check can be shown to a person later.";
 
 const CHECK_FIELDS = [
@@ -72,8 +72,8 @@ const TOOLS = [
         },
         sender_country: {
           type: "string",
-          enum: ["GB", "US"],
-          description: "Country the sending business is based in, GB or US. Not the recipient's country. Default GB.",
+          enum: ["GB", "US", "AE"],
+          description: "Country the sending business is based in: GB, US or AE (United Arab Emirates). Not the recipient's country. Default GB.",
         },
         pitch: {
           type: "string",
