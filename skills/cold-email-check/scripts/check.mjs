@@ -16,10 +16,10 @@ import { accessSync, constants, existsSync, readFileSync, realpathSync, writeFil
 import { dirname, extname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const VERSION = "1.0.0";
+export const VERSION = "1.2.0";
 const DEFAULT_API_URL = "https://precleared.dev/api/v1/check";
 const SOURCES = ["published", "bought", "scraped", "given", "unknown"];
-const SENDERS = ["GB", "US"];
+const SENDERS = ["GB", "US", "AE"];
 const VERDICTS = ["ok_to_email", "consent_needed", "blocked", "unknown"];
 const STOP_ERRORS = new Set(["daily_limit", "payment_required", "invalid_key", "revoked_key"]);
 const ROW_ERRORS = new Set(["invalid_row", "invalid_request"]);
@@ -281,10 +281,10 @@ export function buildPayload(facts) {
   }
   const sender = clean(facts.sender).toUpperCase();
   if (!sender) {
-    throw new Error("No sender country. Ask the user where the sending business is based, then pass --sender GB or US.");
+    throw new Error("No sender country. Ask the user where the sending business is based, then pass --sender GB, US or AE.");
   }
   if (!SENDERS.includes(sender)) {
-    throw new Error(`Sender country "${facts.sender}" is not covered: Precleared checks email from businesses based in GB or US.`);
+    throw new Error(`Sender country "${facts.sender}" is not covered: Precleared checks email from businesses based in GB, US or AE.`);
   }
   payload.sender_country = sender;
   const source = clean(facts.source).toLowerCase();
@@ -781,9 +781,9 @@ async function runList(opts, env, out) {
 
   // Facts that apply to every row are checked before anything is read or sent.
   const sender = clean(opts.sender ?? env.PRECLEARED_SENDER_COUNTRY);
-  if (!sender) throw new Error("No sender country. Ask the user where the sending business is based, then pass --sender GB or US.");
+  if (!sender) throw new Error("No sender country. Ask the user where the sending business is based, then pass --sender GB, US or AE.");
   if (!SENDERS.includes(sender.toUpperCase())) {
-    throw new Error(`Sender country "${sender}" is not covered: Precleared checks email from businesses based in GB or US.`);
+    throw new Error(`Sender country "${sender}" is not covered: Precleared checks email from businesses based in GB, US or AE.`);
   }
   if (opts.source !== undefined && !SOURCES.includes(clean(opts.source).toLowerCase())) {
     throw new Error(`--source "${opts.source}" is not one of ${SOURCES.join(", ")}. Ask the user where the addresses came from.`);
