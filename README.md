@@ -113,7 +113,7 @@ The plugin lives beside it: `.claude-plugin/` holds the plugin and marketplace m
 
 | Tool | What it does |
 | --- | --- |
-| `contact_check` | Takes a recipient email or domain, your sender country (GB or US), the pitch and where the address came from. Returns `verdict` (ok_to_email, consent_needed, blocked or unknown), `confidence`, the rule quoted with its source, `footer_text` (what the email's footer must include, not wording to paste), `next_step`, the facts used, and a signed `receipt`. Not needed for transactional email such as invoices. |
+| `contact_check` | Takes a recipient email or domain, your sender country (GB, US or AE), the pitch and where the address came from. Returns `verdict` (ok_to_email, consent_needed, blocked or unknown), `confidence`, the rule quoted with its source, `footer_text` (what the email's footer must include, not wording to paste), `next_step`, the facts used, and a signed `receipt`. Not needed for transactional email such as invoices. |
 | `verify_receipt` | Takes a receipt id and returns the receipt with its hashes, Ed25519 signature and public key. |
 
 ## Example
