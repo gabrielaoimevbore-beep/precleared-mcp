@@ -123,12 +123,18 @@ def test_full_body_is_normalised():
 @pytest.mark.parametrize("field,value,message", [
     ("recipient_country", "GBR", "Recipient country must be a two-letter country code"),
     ("default_recipient_country", "1A", "Fallback country must be a two-letter country code"),
-    ("sender_country", "DE", "Sender country must be one of: GB, US."),
+    ("sender_country", "DE", "Sender country must be one of: GB, US, AE."),
     ("address_source", "linkedin", "Address source must be one of: published, bought, scraped, given, unknown."),
 ])
 def test_bad_values_are_refused_before_any_request(field, value, message):
     body, problem = client.build_check_body({"recipient_email": "jo@acme.co.uk", field: value})
     assert body == {} and problem.startswith(message)
+
+
+def test_uae_sender_is_accepted():
+    body, problem = client.build_check_body({"recipient_email": "jo@acme.co.uk", "sender_country": "ae"})
+    assert problem is None
+    assert body == {"recipient_email": "jo@acme.co.uk", "sender_country": "AE"}
 
 
 def test_unset_pitch_relevant_is_not_sent():
