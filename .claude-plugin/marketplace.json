@@ -10,7 +10,7 @@
     {
       "name": "precleared",
       "source": "./",
-      "description": "Check whether a cold email to an address is allowed before your agent sends it (UK, US, Canada, Germany, France), with the rule quoted, the footer requirements and a signed receipt.",
+      "description": "Check whether a cold email to an address is allowed before your agent sends it (UK, US, Canada, Germany, France, Australia, Ireland and the Netherlands), with the rule quoted, the footer requirements and a signed receipt.",
       "category": "sales",
       "tags": ["cold-email", "outreach", "compliance", "gdpr", "can-spam", "casl"]
     }
