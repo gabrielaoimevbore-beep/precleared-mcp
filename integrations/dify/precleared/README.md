@@ -28,7 +28,7 @@ The agent sees a short summary it can act on, plus the full answer as JSON.
 ### In a workflow
 
 1. Put the tool node before the node that sends email.
-2. Set **Sender country** (GB or US) and, if all your prospects are in one country, **Fallback country** in the node.
+2. Set **Sender country** (GB, US or AE) and, if all your prospects are in one country, **Fallback country** in the node.
 3. Map the lead's email address to **Recipient email**. Set **Address source** if you know it, because it changes the verdict.
 4. Branch on the `ok_to_send` output: when true, send with a footer that meets `footer_text`; when false, hold the email and follow `next_step`.
 5. Store `receipt_id` with the lead, so the check can be shown later.

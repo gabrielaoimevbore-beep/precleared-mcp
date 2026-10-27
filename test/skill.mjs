@@ -156,6 +156,11 @@ const ok = ["--sender", "GB", "--source", "published"];
 }
 {
   seen.length = 0;
+  const r = await run(["--email", "omar@example-trading.ae", "--sender", "ae", "--source", "published"]);
+  check("UAE sender accepted", r.code === 0 && seen[0]?.body.sender_country === "AE", JSON.stringify(seen[0]?.body));
+}
+{
+  seen.length = 0;
   const r = await run(["--email", "mailto:Jane@Acme.co.uk?subject=Hello", ...ok]);
   check("mailto link and query stripped", r.code === 0 && seen[0]?.body.recipient_email === "jane@acme.co.uk", JSON.stringify(seen[0]?.body));
 }

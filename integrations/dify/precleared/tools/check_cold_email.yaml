@@ -44,7 +44,7 @@ parameters:
       en_US: Sender country
     human_description:
       en_US: The country your sending business is based in. This is not the recipient's country.
-    llm_description: Country the sending business is based in, GB or US. Not the recipient's country.
+    llm_description: Country the sending business is based in, GB, US or AE (United Arab Emirates). Not the recipient's country.
     options:
       - value: GB
         label:
@@ -52,6 +52,9 @@ parameters:
       - value: US
         label:
           en_US: United States (US)
+      - value: AE
+        label:
+          en_US: United Arab Emirates (AE)
   - name: address_source
     type: select
     required: false

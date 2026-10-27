@@ -36,7 +36,7 @@ COUNTRY_FIELDS = {
     "default_recipient_country": "Fallback country",
 }
 SELECT_FIELDS = {
-    "sender_country": ("Sender country", ("GB", "US")),
+    "sender_country": ("Sender country", ("GB", "US", "AE")),
     "address_source": ("Address source", ("published", "bought", "scraped", "given", "unknown")),
 }
 BOOL_FIELDS = ("pitch_relevant", "existing_customer", "suppressed")

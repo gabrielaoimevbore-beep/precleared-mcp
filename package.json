@@ -1,6 +1,6 @@
 {
   "name": "precleared-mcp",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Cold email compliance check for outreach agents: GDPR, PECR, CAN-SPAM, CASL verdict with a signed receipt. Stdio MCP server for the hosted Precleared service.",
   "type": "module",
   "main": "index.js",
