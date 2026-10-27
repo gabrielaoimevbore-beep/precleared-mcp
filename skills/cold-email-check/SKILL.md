@@ -5,7 +5,7 @@ license: MIT
 compatibility: Needs network access to precleared.dev. Uses the Precleared MCP tools when they are connected, otherwise the bundled script (Node 18 or later) or curl.
 metadata:
   author: Precleared
-  version: "1.0.0"
+  version: "1.2.0"
   homepage: https://precleared.dev
 ---
 
@@ -20,7 +20,7 @@ Check each new recipient once, before the first cold email, when:
 - the email markets or sells something (a product, a service, a partnership) to someone who has not asked to hear from the sender and is not already a customer. Having someone's address, from a business card, a form or a directory, is not the same as them asking to hear from the sender, and
 - there is a specific address or company to check. A template with no recipients needs no check.
 
-Precleared covers senders based in the UK or the US. It has full rules for recipients in the UK, the US, Canada, Germany, France, Australia, Ireland and the Netherlands; for many other European countries it answers `consent_needed`, and elsewhere `unknown`. If the sender's business is based outside the UK and the US, tell the user Precleared can't assess it rather than running a check.
+Precleared covers senders based in the UK, the US or the United Arab Emirates (UAE). It has full rules for recipients in the UK, the US, Canada, Germany, France, Australia, Ireland and the Netherlands; for many other European countries it answers `consent_needed`, and elsewhere `unknown`. If the sender's business is based anywhere else, tell the user Precleared can't assess it rather than running a check.
 
 Skip transactional email (receipts, invoices, password resets, delivery updates), replies in a thread the recipient started, and newsletters to people who opted in. Check again if the pitch, or where the address came from, changes.
 
@@ -31,7 +31,7 @@ The verdict depends on the facts you pass. Take them from the user or the lead d
 | Field | What to pass |
 | --- | --- |
 | `recipient_email` | One address per check. Use `recipient_domain` (for example `acme.co.uk`) only when there is no address yet. |
-| `sender_country` | `GB` or `US`: where the sending business is based, not where the recipient is. Ask once if you don't know. |
+| `sender_country` | `GB`, `US` or `AE` (United Arab Emirates): where the sending business is based, not where the recipient is. Ask once if you don't know. |
 | `address_source` | Where the address came from: `published` (on their website, a profile or a directory), `bought` (a purchased list), `scraped` (collected by a tool), `given` (they gave it to the sender) or `unknown`. Ask the user if it isn't clear, and use `unknown` if they can't say. Never assume `published`. |
 | `pitch` | What the email offers, in a few words, for example "bookkeeping software for dental practices". |
 | `recipient_country` | Two-letter code, if known. Otherwise Precleared works it out from the domain and company records. |
