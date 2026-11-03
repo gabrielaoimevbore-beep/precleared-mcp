@@ -95,6 +95,10 @@ Or with Docker: `docker build -t precleared-mcp . && docker run -i --rm -e PRECL
 
 The `Authorization` header is optional, and `X-API-Key: pc_live_...` works too. Without a key you get 100 free checks a day over the hosted MCP endpoint (10 over REST), shared by everyone on the same IP address. A free key from https://precleared.dev/get-key gives you your own 100 a day over MCP (25 over REST); a £39 pack adds 2,000 checks that never expire.
 
+### Claude Managed Agents
+
+A ready-made agent definition that checks every recipient before drafting is in [examples/claude-managed-agents](examples/claude-managed-agents).
+
 ## What is in this repository
 
 `index.js` is a small MCP server (Node 18 or later, one dependency) that exposes the same tools as the hosted endpoint and fulfils them through the public REST API. Nothing is stored locally and nothing is sent to the recipient. The hosted endpoint at `https://precleared.dev/mcp` is the canonical server: without a key it allows 100 checks a day, while the REST API behind this local server allows 10 a day per network, so add a free key if you run it locally at any volume.
