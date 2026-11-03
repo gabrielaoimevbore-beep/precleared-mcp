@@ -39,6 +39,20 @@ const fake = http.createServer((req, res) => {
         }),
       );
     }
+    if ((req.method === "POST" || req.method === "DELETE") && url.pathname === "/api/v1/suppressions") {
+      if (!req.headers.authorization) {
+        res.writeHead(401, { "content-type": "application/json" });
+        return res.end(JSON.stringify({ error: "key_required", message: "An opt-out list belongs to a Precleared key." }));
+      }
+      const body = JSON.parse(data);
+      const entry = { id: "sup_1", type: body.email ? "email" : "domain", masked_email: body.email ? "j***@acme.co.uk" : null, domain: "acme.co.uk", reason: body.reason || null, source: "api", created_at: "2026-11-03T00:00:00Z" };
+      if (req.method === "DELETE") {
+        res.writeHead(200, { "content-type": "application/json" });
+        return res.end(JSON.stringify({ removed: true, entry }));
+      }
+      res.writeHead(201, { "content-type": "application/json" });
+      return res.end(JSON.stringify({ created: true, entry, charged: false }));
+    }
     if (req.method === "GET" && url.pathname === "/api/v1/receipt") {
       const id = url.searchParams.get("id");
       if (id === "cc_rcpt_0123456789ABCDEF") {
@@ -72,7 +86,11 @@ await withServer({ PRECLEARED_API_BASE: "http://127.0.0.1:1/api/v1" }, async (cl
   assert.equal(info.name, "precleared");
   assert.ok(client.getInstructions().startsWith("Precleared answers one question"));
   const { tools } = await client.listTools();
-  assert.deepEqual(tools.map((t) => t.name).sort(), ["contact_check", "verify_receipt"]);
+  assert.deepEqual(tools.map((t) => t.name).sort(), ["contact_check", "suppress_contact", "verify_receipt"]);
+  assert.deepEqual(tools.find((t) => t.name === "contact_check").inputSchema.properties.sender_country.enum, ["GB", "US", "AE", "CA"]);
+  assert.deepEqual(tools.find((t) => t.name === "contact_check").inputSchema.properties.email.required, ["body"]);
+  assert.match(client.getInstructions(), /Spain, Italy, Latvia or the United Arab Emirates/);
+  assert.match(tools.find((t) => t.name === "contact_check").description, /Latvia's Information Society Services Law/);
   assert.equal(tools.find((t) => t.name === "verify_receipt").annotations.readOnlyHint, true);
   assert.deepEqual(tools.find((t) => t.name === "verify_receipt").inputSchema.required, ["id"]);
   assert.deepEqual(tools.find((t) => t.name === "contact_check").outputSchema.required, ["verdict"]);
@@ -85,6 +103,12 @@ await withServer({ PRECLEARED_API_BASE: "http://127.0.0.1:1/api/v1" }, async (cl
   assert.equal(r.isError, true);
   assert.match(r.content[0].text, /could not be reached/);
   console.log("ok  unreachable API reported cleanly");
+
+  // 2b. The opt-out list needs a key, and the server says so without calling the API.
+  const nokey = await client.callTool({ name: "suppress_contact", arguments: { email: "jane@acme.co.uk" } });
+  assert.equal(nokey.isError, true);
+  assert.match(nokey.content[0].text, /PRECLEARED_API_KEY is not set/);
+  console.log("ok  suppress_contact without a key explains itself");
 });
 
 // 3. Real round trips against the fake API, with a key.
@@ -102,6 +126,33 @@ await withServer({ PRECLEARED_API_BASE: `http://127.0.0.1:${port}/api/v1/`, PREC
   assert.match(parsed.facts.ua, /^precleared-mcp\/1\./);
   assert.deepEqual(parsed.facts.echo, { recipient_email: "jane@acme.co.uk", address_source: "published", pitch: "bookkeeping software", existing_customer: false });
   console.log("ok  contact_check forwarded with key and clean body");
+
+  const withDraft = await client.callTool({
+    name: "contact_check",
+    arguments: { recipient_email: "jane@acme.co.uk", sender_country: "CA", company_name: "Acme Ltd", email: { subject: "Hi", body: "Hello {{unsubscribe}}", from_name: "Sam" } },
+  });
+  assert.notEqual(withDraft.isError, true);
+  const draftEcho = JSON.parse(withDraft.content[0].text).facts.echo;
+  assert.equal(draftEcho.sender_country, "CA");
+  assert.equal(draftEcho.company_name, "Acme Ltd");
+  assert.deepEqual(draftEcho.email, { subject: "Hi", body: "Hello {{unsubscribe}}", from_name: "Sam" });
+  console.log("ok  draft email, company name and CA sender forwarded");
+
+  const added = await client.callTool({ name: "suppress_contact", arguments: { email: "jane@acme.co.uk", reason: "asked not to be contacted" } });
+  assert.notEqual(added.isError, true);
+  assert.equal(added.structuredContent.created, true);
+  assert.equal(added.structuredContent.charged, false);
+  const removedResult = await client.callTool({ name: "suppress_contact", arguments: { domain: "acme.co.uk", remove: true } });
+  assert.notEqual(removedResult.isError, true);
+  assert.equal(removedResult.structuredContent.removed, true);
+  const sup = seen.filter((s) => s.url.startsWith("/api/v1/suppressions"));
+  assert.deepEqual(sup.map((s) => s.method), ["POST", "DELETE"]);
+  assert.deepEqual(JSON.parse(sup[0].body), { email: "jane@acme.co.uk", reason: "asked not to be contacted" });
+  assert.deepEqual(JSON.parse(sup[1].body), { domain: "acme.co.uk" });
+  const noTarget = await client.callTool({ name: "suppress_contact", arguments: {} });
+  assert.equal(noTarget.isError, true);
+  assert.match(noTarget.content[0].text, /Give email or domain/);
+  console.log("ok  suppress_contact adds and removes through the API");
 
   const missing = await client.callTool({ name: "contact_check", arguments: {} });
   assert.equal(missing.isError, true);
@@ -123,6 +174,6 @@ await withServer({ PRECLEARED_API_BASE: `http://127.0.0.1:${port}/api/v1/`, PREC
   console.log("ok  unknown tool rejected");
 });
 
-assert.equal(seen.filter((s) => s.url.startsWith("/api/v1/check")).length, 1, "one check request reached the API");
+assert.equal(seen.filter((s) => s.url.startsWith("/api/v1/check")).length, 2, "two check requests reached the API");
 fake.close();
 console.log("all tests passed");

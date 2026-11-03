@@ -2,7 +2,7 @@
 
 Is your agent allowed to send that cold email? Precleared answers that for one recipient at a time, before the first email goes out. Each check returns a verdict, the rule that decided it with its legal source, what the email's footer must include, the next step and a signed receipt ID you can show a client or auditor later.
 
-It covers the UK, US, Canada, Germany, France, Australia, Ireland and the Netherlands: UK PECR and GDPR, US CAN-SPAM, Canadian CASL, German UWG, French CPCE, Australia's Spam Act, Ireland's ePrivacy Regulations and the Dutch Telecommunicatiewet. Whether an email is allowed often turns on facts you can't see in the address, such as whether a UK recipient is a limited company or a sole trader, so Precleared looks them up live.
+It covers the UK, US, Canada, Germany, France, Australia, Ireland, the Netherlands, Spain, Italy, Latvia and the United Arab Emirates: UK PECR and GDPR, US CAN-SPAM, Canadian CASL, German UWG, French CPCE, Australia's Spam Act, Ireland's ePrivacy Regulations, the Dutch Telecommunicatiewet, Spain's LSSI, Italy's Privacy Code, Latvia's Information Society Services Law and the UAE's PDPL. Whether an email is allowed often turns on facts you can't see in the address, such as whether a UK recipient is a limited company or a sole trader, so Precleared looks them up live.
 
 ## Tools
 
@@ -28,7 +28,7 @@ The agent sees a short summary it can act on, plus the full answer as JSON.
 ### In a workflow
 
 1. Put the tool node before the node that sends email.
-2. Set **Sender country** (GB, US or AE) and, if all your prospects are in one country, **Fallback country** in the node.
+2. Set **Sender country** (GB, US, AE or CA) and, if all your prospects are in one country, **Fallback country** in the node.
 3. Map the lead's email address to **Recipient email**. Set **Address source** if you know it, because it changes the verdict.
 4. Branch on the `ok_to_send` output: when true, send with a footer that meets `footer_text`; when false, hold the email and follow `next_step`.
 5. Store `receipt_id` with the lead, so the check can be shown later.

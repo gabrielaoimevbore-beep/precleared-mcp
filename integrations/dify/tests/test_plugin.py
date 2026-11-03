@@ -123,7 +123,7 @@ def test_full_body_is_normalised():
 @pytest.mark.parametrize("field,value,message", [
     ("recipient_country", "GBR", "Recipient country must be a two-letter country code"),
     ("default_recipient_country", "1A", "Fallback country must be a two-letter country code"),
-    ("sender_country", "DE", "Sender country must be one of: GB, US, AE."),
+    ("sender_country", "DE", "Sender country must be one of: GB, US, AE, CA."),
     ("address_source", "linkedin", "Address source must be one of: published, bought, scraped, given, unknown."),
 ])
 def test_bad_values_are_refused_before_any_request(field, value, message):

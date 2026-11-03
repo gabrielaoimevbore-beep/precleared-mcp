@@ -1,8 +1,8 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "precleared",
-  "version": "1.2.0",
-  "description": "Checks whether a cold marketing email to a specific address is allowed before your agent sends it, in the UK, US, Canada, Germany, France, Australia, Ireland and the Netherlands. One call per address: a verdict, the rule quoted with its source, what the footer must include and a signed receipt.",
+  "version": "1.3.0",
+  "description": "Checks whether a cold marketing email to a specific address is allowed before your agent sends it, in the UK, US, Canada, Germany, France, Australia, Ireland, the Netherlands, Spain, Italy, Latvia and the United Arab Emirates. One call per address: a verdict, the rule quoted with its source, what the footer must include and a signed receipt; pass the draft and it also checks the footer, and a per-key opt-out list makes later checks on listed addresses answer blocked.",
   "author": {
     "name": "Precleared",
     "email": "support@precleared.dev",

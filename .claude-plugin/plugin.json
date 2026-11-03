@@ -1,8 +1,8 @@
 {
   "name": "precleared",
   "displayName": "Precleared",
-  "version": "1.2.0",
-  "description": "Checks whether a cold marketing email to a specific address is allowed before your agent sends it, under UK, US, Canadian, German, French, Australian, Irish and Dutch rules. Bundles the cold-email-check skill with the Precleared connector: a verdict per address, the rule quoted, what the footer must include and a signed receipt.",
+  "version": "1.3.0",
+  "description": "Checks whether a cold marketing email to a specific address is allowed before your agent sends it, under UK, US, Canadian, German, French, Australian, Irish, Dutch, Spanish, Italian, Latvian and UAE rules. Bundles the cold-email-check skill with the Precleared connector: a verdict per address, the rule quoted, what the footer must include and a signed receipt.",
   "author": {
     "name": "Precleared",
     "email": "support@precleared.dev",

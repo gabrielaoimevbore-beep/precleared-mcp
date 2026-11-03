@@ -4,7 +4,7 @@
 
 [![smithery badge](https://smithery.ai/badge/gabrielaoimevbore/precleared)](https://smithery.ai/servers/gabrielaoimevbore/precleared)
 
-**Is your agent allowed to send that?** Precleared answers before the email goes out: a per-address verdict on cold marketing email, the rule quoted, what the footer must include, and a signed receipt anyone can verify. Covers the UK (PECR and UK GDPR), the US (CAN-SPAM), Canada (CASL), Germany (UWG), France (CPCE), Australia (Spam Act), Ireland (S.I. 336/2011) and the Netherlands (Telecommunicatiewet).
+**Is your agent allowed to send that?** Precleared answers before the email goes out: a per-address verdict on cold marketing email, the rule quoted, what the footer must include, and a signed receipt anyone can verify. Covers the UK (PECR and UK GDPR), the US (CAN-SPAM), Canada (CASL), Germany (UWG), France (CPCE), Australia (Spam Act), Ireland (S.I. 336/2011), the Netherlands (Telecommunicatiewet), Spain (LSSI), Italy (Privacy Code), Latvia (Information Society Services Law) and the United Arab Emirates (PDPL).
 
 It sits between the step that finds an address (Hunter, Apollo, Clay) and the step that sends (Gmail, Outlook, Instantly, lemlist). One call per new contact, before the first email. It is not needed for invoices, receipts or other transactional email.
 
@@ -97,7 +97,7 @@ The `Authorization` header is optional, and `X-API-Key: pc_live_...` works too. 
 
 ## What is in this repository
 
-`index.js` is a small MCP server (Node 18 or later, one dependency) that exposes the same two tools as the hosted endpoint and fulfils them through the public REST API. Nothing is stored locally and nothing is sent to the recipient. The hosted endpoint at `https://precleared.dev/mcp` is the canonical server: without a key it allows 100 checks a day, while the REST API behind this local server allows 10 a day per network, so add a free key if you run it locally at any volume.
+`index.js` is a small MCP server (Node 18 or later, one dependency) that exposes the same tools as the hosted endpoint and fulfils them through the public REST API. Nothing is stored locally and nothing is sent to the recipient. The hosted endpoint at `https://precleared.dev/mcp` is the canonical server: without a key it allows 100 checks a day, while the REST API behind this local server allows 10 a day per network, so add a free key if you run it locally at any volume.
 
 ```bash
 npm install
@@ -113,8 +113,9 @@ The plugin lives beside it: `.claude-plugin/` holds the plugin and marketplace m
 
 | Tool | What it does |
 | --- | --- |
-| `contact_check` | Takes a recipient email or domain, your sender country (GB, US or AE), the pitch and where the address came from. Returns `verdict` (ok_to_email, consent_needed, blocked or unknown), `confidence`, the rule quoted with its source, `footer_text` (what the email's footer must include, not wording to paste), `next_step`, the facts used, and a signed `receipt`. Not needed for transactional email such as invoices. |
+| `contact_check` | Takes a recipient email or domain, your sender country (GB, US, AE or CA), the pitch, where the address came from and, if you have them, the company name, the person's name and the draft email. Returns `verdict` (ok_to_email, consent_needed, blocked or unknown), `confidence`, the rule quoted with its source, `footer_text` (what the email's footer must include, not wording to paste), `next_step`, the facts used, `email_check` when a draft was passed (does the footer have an opt-out, the sender's identity and, where needed, a postal address; the draft is not stored) and a signed `receipt`. Not needed for transactional email such as invoices. |
 | `verify_receipt` | Takes a receipt id and returns the receipt with its hashes, Ed25519 signature and public key. |
+| `suppress_contact` | Adds an address or a whole domain to the key's opt-out list, or removes it. Every later `contact_check` on a listed address answers `blocked`, free of charge. Needs `PRECLEARED_API_KEY`. |
 
 ## Example
 

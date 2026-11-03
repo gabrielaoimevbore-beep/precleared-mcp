@@ -2,7 +2,7 @@
 // precleared-mcp: a Model Context Protocol server (stdio) for Precleared,
 // the cold email compliance check for outbound agents. https://precleared.dev
 //
-// It exposes two tools, contact_check and verify_receipt, and fulfils them
+// It exposes three tools, contact_check, verify_receipt and suppress_contact, and fulfils them
 // through Precleared's public REST API (https://precleared.dev/api/v1).
 // Nothing is sent to the recipient; nothing is stored locally.
 //
@@ -17,7 +17,7 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
-const VERSION = "1.2.0";
+const VERSION = "1.3.0";
 const API_BASE = (process.env.PRECLEARED_API_BASE || "https://precleared.dev/api/v1").replace(/\/+$/, "");
 const API_KEY = (process.env.PRECLEARED_API_KEY || "").trim();
 const TIMEOUT_MS = Math.max(1000, Number(process.env.PRECLEARED_TIMEOUT_MS) || 30000);
@@ -26,13 +26,15 @@ const DOCS_URL = "https://precleared.dev/docs";
 
 const INSTRUCTIONS =
   "Precleared answers one question for outbound agents: may a cold or unsolicited marketing email be sent to this address? " +
-  "Use contact_check once per recipient before the first email to anyone who is not already a customer, in the UK, US, Canada, Germany, France, Australia, Ireland or the Netherlands. " +
+  "Use contact_check once per recipient before the first email to anyone who is not already a customer, in the UK, US, Canada, Germany, France, Australia, Ireland, the Netherlands, Spain, Italy, Latvia or the United Arab Emirates. " +
   "It is not needed for transactional emails such as invoices, receipts or password resets. " +
   "It returns a verdict (ok_to_email, consent_needed, blocked or unknown), the rule that decided it with its source, what the email's footer must include (footer_text), a next step and a signed receipt id. " +
   "ok_to_email means send, with a footer that meets footer_text, for example who you are, a postal address and a way to opt out; footer_text describes the requirement and is not wording to paste. " +
   "consent_needed and blocked mean do not send and follow next_step; unknown means a fact could not be established, so treat it as consent_needed unless you can supply the missing fact. " +
+  "Pass the draft in the email field and the answer also says whether its footer has an opt-out, the sender's identity and, where the rule needs one, a postal address; the draft is not stored. " +
   "No sign-in is needed, a check usually takes a few seconds, and nothing is sent to the recipient. " +
-  "verify_receipt returns a receipt by id so a check can be shown to a person later.";
+  "verify_receipt returns a receipt by id so a check can be shown to a person later. " +
+  "suppress_contact adds an address or domain to the key's own opt-out list (or removes it); every later check on it answers blocked, free of charge.";
 
 const CHECK_FIELDS = [
   "recipient_email",
@@ -41,10 +43,14 @@ const CHECK_FIELDS = [
   "pitch",
   "address_source",
   "recipient_country",
+  "default_recipient_country",
+  "company_name",
+  "recipient_name",
   "company_number",
   "pitch_relevant",
   "existing_customer",
   "suppressed",
+  "email",
 ];
 
 const TOOLS = [
@@ -52,11 +58,12 @@ const TOOLS = [
     name: "contact_check",
     title: "Contact check",
     description:
-      "Check whether a cold or unsolicited marketing email to one recipient is allowed under UK PECR and GDPR, US CAN-SPAM, Canadian CASL, German UWG or French rules. " +
+      "Check whether a cold or unsolicited marketing email to one recipient is allowed under UK PECR and GDPR, US CAN-SPAM, Canadian CASL, German UWG, French CPCE, Australia's Spam Act, Ireland's ePrivacy Regulations, the Dutch Telecommunicatiewet, Spain's LSSI, Italy's Privacy Code, Latvia's Information Society Services Law and the UAE's PDPL. " +
       "Use it before the first email to a new contact, one call per address. " +
       "Not needed for transactional emails such as invoices, receipts or password resets. " +
       "Returns the verdict, confidence, the rule quoted with its source, what the email's footer must include, the next step and the facts used. " +
-      "Each check uses one check from your allowance and is saved as a signed receipt. It does not send anything.",
+      "Pass the draft in email and the answer also reports whether its footer meets the rule (email_check). " +
+      "Each charged check uses one check from your allowance and is saved as a signed receipt; answers where no rule applied, and one re-check within a day, are free. It does not send anything.",
     inputSchema: {
       type: "object",
       properties: {
@@ -72,8 +79,8 @@ const TOOLS = [
         },
         sender_country: {
           type: "string",
-          enum: ["GB", "US", "AE"],
-          description: "Country the sending business is based in: GB, US or AE (United Arab Emirates). Not the recipient's country. Default GB.",
+          enum: ["GB", "US", "AE", "CA"],
+          description: "Country the sending business is based in: GB, US, AE (United Arab Emirates) or CA (Canada). Canadian senders must also meet CASL. Not the recipient's country. Default GB.",
         },
         pitch: {
           type: "string",
@@ -91,7 +98,25 @@ const TOOLS = [
           type: "string",
           pattern: "^[A-Za-z]{2}$",
           description:
-            "Two-letter country code of the recipient if known, for example GB or DE. Otherwise it is worked out from the domain and company records.",
+            "Two-letter country code of the recipient if known, for example GB or DE. Otherwise it is worked out from the domain, company records and the company's website.",
+        },
+        default_recipient_country: {
+          type: "string",
+          pattern: "^[A-Za-z]{2}$",
+          description:
+            "Two-letter country code to use only when the recipient's country can't be worked out from recipient_country, the domain, company records or the company's website, for example US if all your prospects are in the US. recipient_country always wins.",
+        },
+        company_name: {
+          type: "string",
+          maxLength: 160,
+          description:
+            "The recipient's company or organisation name if you know it, for example from your CRM. For UK recipients it is used to search Companies House when the domain alone does not find the company. A company is only used when other evidence links it to the recipient.",
+        },
+        recipient_name: {
+          type: "string",
+          maxLength: 120,
+          description:
+            "The recipient's full name if you know it, for example Jane Smith. For UK recipients it is matched against a company's current officers at Companies House. Precleared does not store it.",
         },
         company_number: {
           type: "string",
@@ -110,6 +135,18 @@ const TOOLS = [
           type: "boolean",
           description: "True if the recipient is on your own do-not-contact list.",
         },
+        email: {
+          type: "object",
+          description:
+            "The draft email, if you want the answer to say whether its footer meets the rule for the recipient's country. The body is not stored; only a hash of it goes on the receipt.",
+          properties: {
+            subject: { type: "string", maxLength: 300, description: "Subject line." },
+            body: { type: "string", maxLength: 20000, description: "Body, plain text or HTML, including the footer and any merge tags such as {{unsubscribe}}." },
+            from_name: { type: "string", maxLength: 120, description: "Sender name shown to the recipient." },
+            from_email: { type: "string", maxLength: 254, description: "Sending address." },
+          },
+          required: ["body"],
+        },
       },
     },
     outputSchema: {
@@ -123,6 +160,8 @@ const TOOLS = [
         next_step: { type: ["string", "null"], description: "What to do next." },
         facts: { type: "object", description: "Facts gathered about the recipient." },
         receipt: { type: "object", description: "Signed receipt for this check, with id and verify_url." },
+        email_check: { type: ["object", "null"], description: "Only when a draft was passed in email: status (pass or fail), the requirements checked (opt_out, sender_identity, postal_address, commercial_nature), which are missing, and a note." },
+        charged: { type: "boolean", description: "False when the answer was free (no rule applied, a re-check within a day, or an address on your opt-out list)." },
         rules_version: { type: "string", description: "Version of the rule set used." },
         usage: { type: "object", description: "Allowance left for the caller." },
         disclaimer: { type: "string", description: "Fixed disclaimer line." },
@@ -178,6 +217,39 @@ const TOOLS = [
       title: "Verify receipt",
       readOnlyHint: true,
       idempotentHint: true,
+    },
+  },
+  {
+    name: "suppress_contact",
+    title: "Opt-out list",
+    description:
+      "Add an email address or a whole domain to this key's opt-out list, or remove it. Use it when someone unsubscribes, replies asking not to be contacted, or must never be emailed. " +
+      "Every later contact_check on a listed address answers blocked, free of charge, so the list works across every tool that uses the same key. " +
+      "Needs PRECLEARED_API_KEY: the list belongs to a key. Nothing is sent to the recipient.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        email: { type: "string", maxLength: 254, description: "The address to list. Give this or domain." },
+        domain: { type: "string", maxLength: 253, description: "A whole domain to list, for example acme.co.uk. Give this or email." },
+        remove: { type: "boolean", description: "True to take the address or domain off the list instead. Default false." },
+        reason: { type: "string", maxLength: 200, description: "Why, in a few words, for example 'replied asking not to be contacted'. Kept with the entry." },
+      },
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        created: { type: "boolean", description: "True when a new entry was added; false when it was already listed." },
+        removed: { type: "boolean", description: "True when an entry was removed." },
+        entry: { type: ["object", "null"], description: "The entry: id, type, masked_email, domain, reason, source, created_at." },
+        charged: { type: "boolean", description: "Always false: listing is free." },
+      },
+    },
+    annotations: {
+      title: "Opt-out list",
+      readOnlyHint: false,
+      destructiveHint: true,
+      idempotentHint: true,
+      openWorldHint: false,
     },
   },
 ];
@@ -252,6 +324,21 @@ async function contactCheck(args) {
   return okResult(res.body);
 }
 
+async function suppressContact(args) {
+  const email = typeof args.email === "string" ? args.email.trim() : "";
+  const domain = typeof args.domain === "string" ? args.domain.trim() : "";
+  if (!email && !domain) return errorResult("Give email or domain.");
+  if (!API_KEY) {
+    return errorResult(`An opt-out list belongs to a Precleared key, and PRECLEARED_API_KEY is not set. Get a free key at https://precleared.dev/get-key and set it, see ${DOCS_URL}.`);
+  }
+  const body = email ? { email } : { domain };
+  if (typeof args.reason === "string" && args.reason.trim()) body.reason = args.reason.trim();
+  const remove = args.remove === true;
+  const res = await api("/suppressions", { method: remove ? "DELETE" : "POST", body: JSON.stringify(body) });
+  if (!res.ok) return errorResult(describeFailure(res.status, res.body, remove ? "the opt-out list removal" : "the opt-out list entry"));
+  return okResult(res.body);
+}
+
 async function verifyReceipt(args) {
   const id = typeof args.id === "string" ? args.id.trim() : "";
   if (!id) return errorResult("Give the receipt id, for example cc_rcpt_0123456789ABCDEF.");
@@ -272,6 +359,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     if (name === "contact_check") return await contactCheck(args);
     if (name === "verify_receipt") return await verifyReceipt(args);
+    if (name === "suppress_contact") return await suppressContact(args);
     return errorResult(`Unknown tool: ${name}`);
   } catch (err) {
     const reason = err && err.name === "AbortError" ? `no reply within ${TIMEOUT_MS} ms` : (err && err.message) || String(err);

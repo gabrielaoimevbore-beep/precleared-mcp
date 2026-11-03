@@ -1,17 +1,17 @@
 ---
 name: cold-email-check
-description: Checks whether a cold or unsolicited marketing email to a specific address is allowed before it is sent, under UK (PECR, UK GDPR), US (CAN-SPAM), Canadian (CASL), German (UWG), French (CPCE), Australian (Spam Act), Irish (S.I. 336/2011) and Dutch (Telecommunicatiewet) rules, using Precleared. Use when the user wants to send, schedule or load first-touch outbound or prospecting emails to specific people who are not already customers, or to vet a cold outreach list before a campaign. Returns a verdict per address, the rule behind it, what the email's footer must include and a signed receipt. Not for transactional email such as receipts, invoices or password resets, replies to someone who wrote first, newsletters to opted-in subscribers, or writing a template before there are recipients.
+description: Checks whether a cold or unsolicited marketing email to a specific address is allowed before it is sent, under UK (PECR, UK GDPR), US (CAN-SPAM), Canadian (CASL), German (UWG), French (CPCE), Australian (Spam Act), Irish (S.I. 336/2011), Dutch (Telecommunicatiewet), Spanish (LSSI), Italian (Privacy Code), Latvian (Information Society Services Law) and UAE (PDPL) rules, using Precleared. Use when the user wants to send, schedule or load first-touch outbound or prospecting emails to specific people who are not already customers, or to vet a cold outreach list before a campaign. Returns a verdict per address, the rule behind it, what the email's footer must include and a signed receipt. Not for transactional email such as receipts, invoices or password resets, replies to someone who wrote first, newsletters to opted-in subscribers, or writing a template before there are recipients.
 license: MIT
 compatibility: Needs network access to precleared.dev. Uses the Precleared MCP tools when they are connected, otherwise the bundled script (Node 18 or later) or curl.
 metadata:
   author: Precleared
-  version: "1.2.0"
+  version: "1.3.0"
   homepage: https://precleared.dev
 ---
 
 # Cold email check
 
-Before the first cold email to a new address, ask Precleared whether that email is allowed. Each check returns a verdict, the rule that decided it with its source, what the footer must include and a signed receipt. Nothing is sent to the recipient, and a check takes about a second.
+Before the first cold email to a new address, ask Precleared whether that email is allowed. Each check returns a verdict, the rule that decided it with its source, what the footer must include and a signed receipt. Nothing is sent to the recipient, and a check usually takes a few seconds.
 
 ## When to check
 
@@ -20,7 +20,7 @@ Check each new recipient once, before the first cold email, when:
 - the email markets or sells something (a product, a service, a partnership) to someone who has not asked to hear from the sender and is not already a customer. Having someone's address, from a business card, a form or a directory, is not the same as them asking to hear from the sender, and
 - there is a specific address or company to check. A template with no recipients needs no check.
 
-Precleared covers senders based in the UK, the US or the United Arab Emirates (UAE). It has full rules for recipients in the UK, the US, Canada, Germany, France, Australia, Ireland and the Netherlands; for many other European countries it answers `consent_needed`, and elsewhere `unknown`. If the sender's business is based anywhere else, tell the user Precleared can't assess it rather than running a check.
+Precleared covers senders based in the UK, the US, Canada or the United Arab Emirates (UAE). It has full rules for recipients in the UK, the US, Canada, Germany, France, Australia, Ireland, the Netherlands, Spain, Italy, Latvia and the UAE; for many other European countries it answers `consent_needed`, and elsewhere `unknown`. If the sender's business is based anywhere else, tell the user Precleared can't assess it rather than running a check.
 
 Skip transactional email (receipts, invoices, password resets, delivery updates), replies in a thread the recipient started, and newsletters to people who opted in. Check again if the pitch, or where the address came from, changes.
 
@@ -31,14 +31,17 @@ The verdict depends on the facts you pass. Take them from the user or the lead d
 | Field | What to pass |
 | --- | --- |
 | `recipient_email` | One address per check. Use `recipient_domain` (for example `acme.co.uk`) only when there is no address yet. |
-| `sender_country` | `GB`, `US` or `AE` (United Arab Emirates): where the sending business is based, not where the recipient is. Ask once if you don't know. |
+| `sender_country` | `GB`, `US`, `AE` (United Arab Emirates) or `CA` (Canada): where the sending business is based, not where the recipient is. Ask once if you don't know. Canadian senders must also meet CASL. |
 | `address_source` | Where the address came from: `published` (on their website, a profile or a directory), `bought` (a purchased list), `scraped` (collected by a tool), `given` (they gave it to the sender) or `unknown`. Ask the user if it isn't clear, and use `unknown` if they can't say. Never assume `published`. |
 | `pitch` | What the email offers, in a few words, for example "bookkeeping software for dental practices". |
-| `recipient_country` | Two-letter code, if known. Otherwise Precleared works it out from the domain and company records. |
+| `recipient_country` | Two-letter code, if known. Otherwise Precleared works it out from the domain, company records and the company's website. |
+| `company_name` | The company or organisation name, if the lead data has it. For UK recipients it helps find the company at Companies House. |
+| `recipient_name` | The person's full name, if known. For UK recipients it is matched against the company's officers. Precleared does not store it. |
+| `email` | The draft, if there is one: `{ subject, body, from_name, from_email }`. The answer then includes `email_check`, which says whether the footer has an opt-out, names the sender and, where the rule needs one, carries a postal address. The draft is not stored; only its hash goes on the receipt. |
 | `company_number` | UK company number, if known. |
 | `pitch_relevant` | `true` if the offer relates to the recipient's job or business, `false` if it doesn't. Leave it out if unsure. |
 | `existing_customer` | `true` if they have bought from the sender before (useful in mixed lists). |
-| `suppressed` | `true` if the address is on the sender's do-not-contact list. |
+| `suppressed` | `true` if the address is on the sender's do-not-contact list. With a key, the `suppress_contact` tool keeps that list at Precleared instead, and every later check on a listed address answers `blocked` for free. |
 
 ## Run the check
 
@@ -76,7 +79,7 @@ node ${CLAUDE_SKILL_DIR}/scripts/check.mjs --file leads.csv --sender GB --source
 
 | Verdict | What to do |
 | --- | --- |
-| `ok_to_email` | Allowed. If the user asked you to send, send it with a footer that meets `footer_text`: usually who is sending, a postal address and a simple, free way to opt out. `footer_text` describes the requirement; it is not wording to paste. |
+| `ok_to_email` | Allowed. If the user asked you to send, send it with a footer that meets `footer_text`: usually who is sending, a postal address and a simple, free way to opt out. `footer_text` describes the requirement; it is not wording to paste. If you passed the draft and `email_check.status` is `fail`, fix what `email_check.missing` lists before sending. |
 | `consent_needed` | Don't send the cold email. Follow `next_step`, for example writing to the company's general address (check that address first) or getting consent through a channel the person opened, and tell the user. |
 | `blocked` | Don't send. Follow `next_step` and tell the user. |
 | `unknown` | Treat it as `consent_needed`. If a missing fact would settle it, such as the recipient's country, a UK company number or where the address came from, get that fact from the user or a record, not a guess, and check once more. |
