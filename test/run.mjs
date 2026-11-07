@@ -89,7 +89,7 @@ await withServer({ PRECLEARED_API_BASE: "http://127.0.0.1:1/api/v1" }, async (cl
   assert.deepEqual(tools.map((t) => t.name).sort(), ["contact_check", "suppress_contact", "verify_receipt"]);
   assert.deepEqual(tools.find((t) => t.name === "contact_check").inputSchema.properties.sender_country.enum, ["GB", "US", "AE", "CA"]);
   assert.deepEqual(tools.find((t) => t.name === "contact_check").inputSchema.properties.email.required, ["body"]);
-  assert.match(client.getInstructions(), /Spain, Italy, Latvia or the United Arab Emirates/);
+  assert.match(client.getInstructions(), /Spain, Italy, Latvia, the United Arab Emirates, Egypt or Qatar/);
   assert.match(tools.find((t) => t.name === "contact_check").description, /Latvia's Information Society Services Law/);
   assert.equal(tools.find((t) => t.name === "verify_receipt").annotations.readOnlyHint, true);
   assert.deepEqual(tools.find((t) => t.name === "verify_receipt").inputSchema.required, ["id"]);

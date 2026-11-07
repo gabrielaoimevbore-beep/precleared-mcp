@@ -2,7 +2,7 @@
 
 Is your agent allowed to send that cold email? Precleared answers that for one recipient at a time, before the first email goes out. Each check returns a verdict, the rule that decided it with its legal source, what the email's footer must include, the next step and a signed receipt ID you can show a client or auditor later.
 
-It covers the UK, US, Canada, Germany, France, Australia, Ireland, the Netherlands, Spain, Italy, Latvia and the United Arab Emirates: UK PECR and GDPR, US CAN-SPAM, Canadian CASL, German UWG, French CPCE, Australia's Spam Act, Ireland's ePrivacy Regulations, the Dutch Telecommunicatiewet, Spain's LSSI, Italy's Privacy Code, Latvia's Information Society Services Law and the UAE's PDPL. Whether an email is allowed often turns on facts you can't see in the address, such as whether a UK recipient is a limited company or a sole trader, so Precleared looks them up live.
+It covers the UK, US, Canada, Germany, France, Australia, Ireland, the Netherlands, Spain, Italy, Latvia, the United Arab Emirates, Egypt and Qatar: UK PECR and GDPR, US CAN-SPAM, Canadian CASL, German UWG, French CPCE, Australia's Spam Act, Ireland's ePrivacy Regulations, the Dutch Telecommunicatiewet, Spain's LSSI, Italy's Privacy Code, Latvia's Information Society Services Law, the UAE's PDPL, Egypt's Personal Data Protection Law and Qatar's Personal Data Privacy Protection Law. Whether an email is allowed often turns on facts you can't see in the address, such as whether a UK recipient is a limited company or a sole trader, so Precleared looks them up live.
 
 ## Tools
 

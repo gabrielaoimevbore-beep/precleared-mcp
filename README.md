@@ -4,7 +4,7 @@
 
 [![smithery badge](https://smithery.ai/badge/gabrielaoimevbore/precleared)](https://smithery.ai/servers/gabrielaoimevbore/precleared)
 
-**Is your agent allowed to send that?** Precleared answers before the email goes out: a per-address verdict on cold marketing email, the rule quoted, what the footer must include, and a signed receipt anyone can verify. Covers the UK (PECR and UK GDPR), the US (CAN-SPAM), Canada (CASL), Germany (UWG), France (CPCE), Australia (Spam Act), Ireland (S.I. 336/2011), the Netherlands (Telecommunicatiewet), Spain (LSSI), Italy (Privacy Code), Latvia (Information Society Services Law) and the United Arab Emirates (PDPL).
+**Is your agent allowed to send that?** Precleared answers before the email goes out: a per-address verdict on cold marketing email, the rule quoted, what the footer must include, and a signed receipt anyone can verify. Covers the UK (PECR and UK GDPR), the US (CAN-SPAM), Canada (CASL), Germany (UWG), France (CPCE), Australia (Spam Act), Ireland (S.I. 336/2011), the Netherlands (Telecommunicatiewet), Spain (LSSI), Italy (Privacy Code), Latvia (Information Society Services Law), the United Arab Emirates (PDPL), Egypt (Personal Data Protection Law) and Qatar (Personal Data Privacy Protection Law).
 
 It sits between the step that finds an address (Hunter, Apollo, Clay) and the step that sends (Gmail, Outlook, Instantly, lemlist). One call per new contact, before the first email. It is not needed for invoices, receipts or other transactional email.
 

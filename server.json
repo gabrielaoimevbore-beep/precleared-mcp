@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "dev.precleared/contact-check",
   "title": "Precleared Contact Check",
-  "description": "Cold email compliance check, 12 countries: per-address verdict, rule cited, signed receipt.",
-  "version": "1.3.0",
+  "description": "Cold email compliance check, 14 countries: per-address verdict, rule cited, signed receipt.",
+  "version": "1.4.0",
   "websiteUrl": "https://precleared.dev",
   "repository": {
     "url": "https://github.com/gabrielaoimevbore-beep/precleared-mcp",

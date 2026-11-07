@@ -16,7 +16,7 @@ import { accessSync, constants, existsSync, readFileSync, realpathSync, writeFil
 import { dirname, extname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const VERSION = "1.3.0";
+export const VERSION = "1.4.0";
 const DEFAULT_API_URL = "https://precleared.dev/api/v1/check";
 const SOURCES = ["published", "bought", "scraped", "given", "unknown"];
 const SENDERS = ["GB", "US", "AE", "CA"];

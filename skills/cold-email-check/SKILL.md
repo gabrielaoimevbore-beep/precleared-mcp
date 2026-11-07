@@ -1,11 +1,11 @@
 ---
 name: cold-email-check
-description: Checks whether a cold or unsolicited marketing email to a specific address is allowed before it is sent, under UK (PECR, UK GDPR), US (CAN-SPAM), Canadian (CASL), German (UWG), French (CPCE), Australian (Spam Act), Irish (S.I. 336/2011), Dutch (Telecommunicatiewet), Spanish (LSSI), Italian (Privacy Code), Latvian (Information Society Services Law) and UAE (PDPL) rules, using Precleared. Use when the user wants to send, schedule or load first-touch outbound or prospecting emails to specific people who are not already customers, or to vet a cold outreach list before a campaign. Returns a verdict per address, the rule behind it, what the email's footer must include and a signed receipt. Not for transactional email such as receipts, invoices or password resets, replies to someone who wrote first, newsletters to opted-in subscribers, or writing a template before there are recipients.
+description: Checks whether a cold or unsolicited marketing email to a specific address is allowed before it is sent, under UK (PECR, UK GDPR), US (CAN-SPAM), Canadian (CASL), German (UWG), French (CPCE), Australian (Spam Act), Irish (S.I. 336/2011), Dutch (Telecommunicatiewet), Spanish (LSSI), Italian (Privacy Code), Latvian (Information Society Services Law), UAE (PDPL), Egyptian (Personal Data Protection Law) and Qatari (Personal Data Privacy Protection Law) rules, using Precleared. Use when the user wants to send, schedule or load first-touch outbound or prospecting emails to specific people who are not already customers, or to vet a cold outreach list before a campaign. Returns a verdict per address, the rule behind it, what the email's footer must include and a signed receipt. Not for transactional email such as receipts, invoices or password resets, replies to someone who wrote first, newsletters to opted-in subscribers, or writing a template before there are recipients.
 license: MIT
 compatibility: Needs network access to precleared.dev. Uses the Precleared MCP tools when they are connected, otherwise the bundled script (Node 18 or later) or curl.
 metadata:
   author: Precleared
-  version: "1.3.0"
+  version: "1.4.0"
   homepage: https://precleared.dev
 ---
 
@@ -20,7 +20,7 @@ Check each new recipient once, before the first cold email, when:
 - the email markets or sells something (a product, a service, a partnership) to someone who has not asked to hear from the sender and is not already a customer. Having someone's address, from a business card, a form or a directory, is not the same as them asking to hear from the sender, and
 - there is a specific address or company to check. A template with no recipients needs no check.
 
-Precleared covers senders based in the UK, the US, Canada or the United Arab Emirates (UAE). It has full rules for recipients in the UK, the US, Canada, Germany, France, Australia, Ireland, the Netherlands, Spain, Italy, Latvia and the UAE; for many other European countries it answers `consent_needed`, and elsewhere `unknown`. If the sender's business is based anywhere else, tell the user Precleared can't assess it rather than running a check.
+Precleared covers senders based in the UK, the US, Canada or the United Arab Emirates (UAE). It has full rules for recipients in the UK, the US, Canada, Germany, France, Australia, Ireland, the Netherlands, Spain, Italy, Latvia, the UAE, Egypt and Qatar; for many other European countries it answers `consent_needed`, and elsewhere `unknown`. If the sender's business is based anywhere else, tell the user Precleared can't assess it rather than running a check.
 
 Skip transactional email (receipts, invoices, password resets, delivery updates), replies in a thread the recipient started, and newsletters to people who opted in. Check again if the pitch, or where the address came from, changes.
 

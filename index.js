@@ -17,7 +17,7 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 
-const VERSION = "1.3.0";
+const VERSION = "1.4.0";
 const API_BASE = (process.env.PRECLEARED_API_BASE || "https://precleared.dev/api/v1").replace(/\/+$/, "");
 const API_KEY = (process.env.PRECLEARED_API_KEY || "").trim();
 const TIMEOUT_MS = Math.max(1000, Number(process.env.PRECLEARED_TIMEOUT_MS) || 30000);
@@ -26,7 +26,7 @@ const DOCS_URL = "https://precleared.dev/docs";
 
 const INSTRUCTIONS =
   "Precleared answers one question for outbound agents: may a cold or unsolicited marketing email be sent to this address? " +
-  "Use contact_check once per recipient before the first email to anyone who is not already a customer, in the UK, US, Canada, Germany, France, Australia, Ireland, the Netherlands, Spain, Italy, Latvia or the United Arab Emirates. " +
+  "Use contact_check once per recipient before the first email to anyone who is not already a customer, in the UK, US, Canada, Germany, France, Australia, Ireland, the Netherlands, Spain, Italy, Latvia, the United Arab Emirates, Egypt or Qatar. " +
   "It is not needed for transactional emails such as invoices, receipts or password resets. " +
   "It returns a verdict (ok_to_email, consent_needed, blocked or unknown), the rule that decided it with its source, what the email's footer must include (footer_text), a next step and a signed receipt id. " +
   "ok_to_email means send, with a footer that meets footer_text, for example who you are, a postal address and a way to opt out; footer_text describes the requirement and is not wording to paste. " +
@@ -58,7 +58,7 @@ const TOOLS = [
     name: "contact_check",
     title: "Contact check",
     description:
-      "Check whether a cold or unsolicited marketing email to one recipient is allowed under UK PECR and GDPR, US CAN-SPAM, Canadian CASL, German UWG, French CPCE, Australia's Spam Act, Ireland's ePrivacy Regulations, the Dutch Telecommunicatiewet, Spain's LSSI, Italy's Privacy Code, Latvia's Information Society Services Law and the UAE's PDPL. " +
+      "Check whether a cold or unsolicited marketing email to one recipient is allowed under UK PECR and GDPR, US CAN-SPAM, Canadian CASL, German UWG, French CPCE, Australia's Spam Act, Ireland's ePrivacy Regulations, the Dutch Telecommunicatiewet, Spain's LSSI, Italy's Privacy Code, Latvia's Information Society Services Law, the UAE's PDPL, Egypt's Personal Data Protection Law and Qatar's Personal Data Privacy Protection Law. " +
       "Use it before the first email to a new contact, one call per address. " +
       "Not needed for transactional emails such as invoices, receipts or password resets. " +
       "Returns the verdict, confidence, the rule quoted with its source, what the email's footer must include, the next step and the facts used. " +
